@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/register.css' %}">
+
+<div class="frame">
+  <div class="rectangle1">
+    <h1 class="titulo">Ingresa tus datos</h1>
+    <form method="post" class="register-form">
+      {% csrf_token %}
+      <div class="campo">
+        <label for="id_username">Nombre de usuario</label>
+        {{ form.username }}
+      </div>
+      <div class="campo">
+        <label for="id_password1">Contraseña</label>
+        {{ form.password1 }}
+      </div>
+      <div class="campo">
+        <label for="id_password2">Confirmar contraseña</label>
+        {{ form.password2 }}
+      </div>
+      
+      {% if form.errors %}
+        <div class="errores">
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <button type="submit">Registrarse</button>
+    </form>
+    <p class="login-link">¿Ya tienes una cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p>
+  </div>
+</div>
+{% endblock %}

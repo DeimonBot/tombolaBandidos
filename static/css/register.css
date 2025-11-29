@@ -1,0 +1,240 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #FFFFFF;
+}
+
+/* Eliminar márgenes del contenedor principal de Django */
+.content,
+main,
+#content {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100%;
+  height: 100%;
+}
+
+.frame {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  min-height: 700px;
+  background: url('../img/fondo.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  mix-blend-mode: darken;
+  opacity: 0.8;
+  box-shadow: inset 0px 4px 4px rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rectangle1 {
+  width: 90%;
+  max-width: 787px;
+  min-height: 700px;
+  background: #FFD6AA;
+  opacity: 0.75;
+  padding: 40px 30px;
+  box-sizing: border-box;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.titulo {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: clamp(28px, 5vw, 40px);
+  line-height: 150%;
+  text-align: center;
+  color: #000000;
+  margin-bottom: 40px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.campo {
+  width: 100%;
+  max-width: 612px;
+  height: auto;
+  min-height: 70px;
+  margin-bottom: 20px;
+  background: #D8D8D8;
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  border-radius: 4px;
+}
+
+.campo label {
+  font-family: 'Inria Serif', serif;
+  font-size: clamp(18px, 2.5vw, 32px);
+  color: #1A1A1A;
+  margin-right: 15px;
+  white-space: nowrap;
+  min-width: fit-content;
+}
+
+.register-form input {
+  border: none;
+  background: transparent;
+  font-size: clamp(16px, 2.5vw, 28px);
+  width: 100%;
+  outline: none;
+  font-family: 'Inria Serif', serif;
+  color: #1A1A1A;
+}
+
+.register-form input::placeholder {
+  color: #666;
+  opacity: 0.6;
+}
+
+/* Estilos para los mensajes de error */
+.errores {
+  width: 100%;
+  max-width: 612px;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 2px solid #ff0000;
+  border-radius: 4px;
+  padding: 15px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.errores p {
+  color: #cc0000;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(14px, 2vw, 18px);
+  margin: 5px 0;
+  line-height: 1.4;
+}
+
+.register-form button {
+  margin-top: 30px;
+  padding: 15px 50px;
+  font-size: clamp(18px, 2.5vw, 24px);
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+}
+
+.register-form button:hover {
+  background-color: #555;
+}
+
+.login-link {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(16px, 2.5vw, 32px);
+  text-align: center;
+  margin-top: 30px;
+  color: #000000;
+  font-weight: 500;
+}
+
+.login-link a {
+  color: #0066CC;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive para tablets */
+@media (max-width: 768px) {
+  .rectangle1 {
+    padding: 30px 20px;
+    min-height: 650px;
+  }
+  
+  .campo {
+    min-height: 60px;
+    padding: 12px 15px;
+  }
+  
+  .campo label {
+    font-size: clamp(16px, 2.5vw, 24px);
+  }
+  
+  .register-form button {
+    padding: 12px 40px;
+  }
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+  .rectangle1 {
+    width: 95%;
+    padding: 25px 15px;
+    min-height: 600px;
+  }
+  
+  .titulo {
+    margin-bottom: 25px;
+    font-size: 24px;
+  }
+  
+  .campo {
+    min-height: 50px;
+    padding: 10px 12px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .campo label {
+    margin-right: 0;
+    font-size: 18px;
+  }
+  
+  .register-form input {
+    font-size: 16px;
+  }
+  
+  .register-form button {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .login-link {
+    margin-top: 20px;
+    font-size: 16px;
+  }
+  
+  .errores {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
