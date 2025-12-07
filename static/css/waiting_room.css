@@ -1,0 +1,219 @@
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.sala-espera {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url('../img/espera.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.75;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 80px;
+}
+
+/* Caja de bienvenida */
+.bienvenida-box {
+  width: 90%;
+  max-width: 746px;
+  height: auto;
+  min-height: 120px;
+  background: #FFD6AA;
+  opacity: 0.85;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  margin-bottom: 60px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.bienvenida-texto {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: clamp(28px, 5vw, 48px);
+  line-height: 100%;
+  text-align: center;
+  color: #000000;
+  margin: 0;
+}
+
+/* Cronómetro circular */
+.cronometro-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 50px;
+}
+
+.cronometro-circulo {
+  width: clamp(280px, 40vw, 358px);
+  height: clamp(280px, 40vw, 347px);
+  background: #FF9959;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 30px rgba(255, 153, 89, 0.5);
+  animation: pulso 2s ease-in-out infinite;
+}
+
+@keyframes pulso {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 8px 30px rgba(255, 153, 89, 0.5);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(255, 153, 89, 0.7);
+  }
+}
+
+.cronometro-tiempo {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: clamp(32px, 6vw, 64px);
+  line-height: 150%;
+  text-align: center;
+  color: #000000;
+  user-select: none;
+}
+
+/* Información de la sala */
+.info-sala {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.mensaje-espera {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 500;
+  color: #000000;
+  background: rgba(255, 214, 170, 0.8);
+  padding: 15px 30px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: inline-block;
+}
+
+.jugadores-conectados {
+  background: rgba(255, 214, 170, 0.7);
+  padding: 12px 25px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.jugadores-conectados p {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-weight: 500;
+  color: #000000;
+  margin: 0;
+}
+
+.jugadores-conectados span {
+  font-weight: 700;
+  color: #FF6B35;
+}
+
+/* Botón salir */
+.btn-salir {
+  padding: 15px 40px;
+  font-size: clamp(18px, 2.5vw, 24px);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-salir:hover {
+  background-color: #555;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+
+.btn-salir:active {
+  transform: translateY(0);
+}
+
+/* Responsive para tablets */
+@media (max-width: 768px) {
+  .sala-espera {
+    padding-top: 60px;
+  }
+  
+  .bienvenida-box {
+    min-height: 100px;
+    padding: 20px 15px;
+    margin-bottom: 40px;
+  }
+  
+  .cronometro-container {
+    margin-bottom: 40px;
+  }
+}
+
+/* Responsive para móviles */
+@media (max-width: 480px) {
+  .sala-espera {
+    padding-top: 70px;
+  }
+  
+  .bienvenida-box {
+    min-height: 80px;
+    padding: 15px 10px;
+    margin-bottom: 30px;
+  }
+  
+  .cronometro-container {
+    margin-bottom: 30px;
+  }
+  
+  .info-sala {
+    margin-bottom: 20px;
+  }
+  
+  .mensaje-espera {
+    padding: 12px 20px;
+    margin-bottom: 15px;
+  }
+  
+  .jugadores-conectados {
+    padding: 10px 20px;
+  }
+  
+  .btn-salir {
+    padding: 12px 30px;
+    font-size: 18px;
+  }
+}

@@ -33,5 +33,19 @@ def logout_view(request):
     return redirect('login')
 
 @login_required
-def home_view(request):
-    return render(request, 'home.html')
+def waiting_room(request):
+    """
+    Vista de la sala de espera.
+    Solo usuarios autenticados pueden acceder.
+    """
+    return render(request, 'waiting_room.html', {
+        'user': request.user
+    })
+
+@login_required
+def home(request):
+    """
+    Vista principal después del login.
+    Redirige a la sala de espera.
+    """
+    return redirect('waiting_room')

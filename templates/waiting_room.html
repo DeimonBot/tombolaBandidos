@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Sala de Espera{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/waiting_room.css' %}">
+
+<div class="sala-espera">
+  <div class="bienvenida-box">
+    <h1 class="bienvenida-texto">Bienvenido, {{ user.username }}</h1>
+  </div>
+  
+  <div class="cronometro-container">
+    <div class="cronometro-circulo">
+      <div class="cronometro-tiempo" id="cronometro">
+        ⏱ Cargando...
+      </div>
+    </div>
+  </div>
+  
+  <div class="info-sala">
+    <p class="mensaje-espera" id="mensaje-estado">Esperando que el juego comience...</p>
+    <div class="jugadores-conectados">
+      <p>Jugadores conectados: <span id="num-jugadores">{{ num_jugadores }}</span></p>
+    </div>
+  </div>
+  
+  <button class="btn-salir" onclick="salirSala()">
+    Salir de la sala
+  </button>
+</div>
+
+<script>
+  // Usar el tiempo que viene del servidor (hora objetivo real)
+  const tiempoFinalServidor = parseInt("{{ tiempo_final_timestamp }}");
+  
+  console.log("⏰ Temporizador iniciado");
+  console.log("Hora actual:", new Date());
+  console.log("Hora final objetivo:", new Date(tiempoFinalServidor));
+  console.log("Timestamp servidor:", tiempoFinalServidor);
+  
+  let intervalo;
+  
+  function actualizarCronometro() {
+    const ahora = Date.now();
+    const tiempoRestante = Math.max(0, tiempoFinalServidor - ahora);
+    
+    console.log("Tiempo restante (ms):", tiempoRestante);
+    
+    if (tiempoRestante <= 0) {
+      document.getElementById('cronometro').textContent = '⏱ 00:00:00';
+      document.getElementById('mensaje-estado').textContent = '¡El juego está comenzando!';
+      clearInterval(intervalo);
+      
+      setTimeout(() => {
+        window.location.href = "{% url 'game_start' %}";
+      }, 2000);
+      return;
+    }
+    
+    const horas = Math.floor(tiempoRestante / (1000 * 60 * 60));
+    const minutos = Math.floor((tiempoRestante % (1000 * 60 * 60)) / (1000 * 60));
+    const segundos = Math.floor((tiempoRestante % (1000 * 60)) / 1000);
+    
+    const h = horas.toString().padStart(2, '0');
+    const m = minutos.toString().padStart(2, '0');
+    const s = segundos.toString().padStart(2, '0');
+    
+    document.getElementById('cronometro').textContent = `⏱ ${h}:${m}:${s}`;
+    
+    const circulo = document.querySelector('.cronometro-circulo');
+    if (tiempoRestante < 30000) {
+      circulo.classList.add('urgente');
+    }
+  }
+  
+  function salirSala() {
+    if (confirm('¿Estás seguro que quieres salir de la sala?')) {
+      window.location.href = "{% url 'home' %}";
+    }
+  }
+  
+  // Iniciar inmediatamente
+  actualizarCronometro();
+  intervalo = setInterval(actualizarCronometro, 1000);
+</script>
+{% endblock %}
