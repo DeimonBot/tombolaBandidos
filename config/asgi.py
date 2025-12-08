@@ -10,6 +10,9 @@ from channels.auth import AuthMiddlewareStack
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
+application = get_asgi_application()
+
+"""
 application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     "websocket": AuthMiddlewareStack(
@@ -18,3 +21,4 @@ application = ProtocolTypeRouter({
         )
     ),
 })
+"""
