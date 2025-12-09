@@ -26,8 +26,19 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-pro
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.azurewebsites.net',]
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+else:
+    ALLOWED_HOSTS = [
+        'tombolabandidosb-h3cwh4dvfnafhkh5.canadacentral-01.azurewebsites.net',
+        '.azurewebsites.net',
+    ]
 
+# CSRF para Azure
+CSRF_TRUSTED_ORIGINS = [
+    'https://tombolabandidosb-h3cwh4dvfnafhkh5.canadacentral-01.azurewebsites.net',
+    'https://*.azurewebsites.net',
+]
 
 # Application definition
 
