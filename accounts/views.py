@@ -11,7 +11,7 @@ def register_view(request):
             user = form.save()
             login(request, user)
             messages.success(request, 'Registro exitoso.')
-            return redirect('home')
+            return redirect('waiting_room')
     else:
         form = RegisterForm()
     return render(request, 'accounts/register.html', {'form': form})
@@ -22,7 +22,7 @@ def login_view(request):
         if form.is_valid():
             login(request, form.get_user())
             messages.success(request, 'Inicio de sesión exitoso.')
-            return redirect('home')
+            return redirect('waiting_room')
     else:
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
@@ -41,11 +41,3 @@ def waiting_room(request):
     return render(request, 'waiting_room.html', {
         'user': request.user
     })
-
-@login_required
-def home(request):
-    """
-    Vista principal después del login.
-    Redirige a la sala de espera.
-    """
-    return redirect('waiting_room')
