@@ -1,8 +1,842 @@
-{% extends 'base.html' %}
-{% block title %}Juego{% endblock %}
-{% block content %}
-<div style="text-align: center; padding: 50px;">
-    <h1>¡El juego ha comenzado!</h1>
-    <p>Aquí irá la lógica del juego...</p>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tómbola Italiana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .game-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .number-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .number-display {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(145deg, #ff6b6b, #ee5a52);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5em;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 15px 40px rgba(255,107,107,0.6);
+            transition: all 0.3s;
+        }
+
+        .number-display.pulse {
+            animation: pulseBall 0.6s ease;
+        }
+
+        @keyframes pulseBall {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-15deg); }
+            50% { transform: scale(1.15) rotate(15deg); }
+            75% { transform: scale(1.2) rotate(-10deg); }
+        }
+
+        .prizes-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .prizes-title {
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .prizes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .prize-item {
+            background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+            padding: 12px;
+            border-radius: 10px;
+            border: 3px solid #ddd;
+            transition: all 0.4s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .prize-item.won {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border-color: #2e7d32;
+            transform: scale(1.05);
+            animation: prizeWon 0.8s ease;
+        }
+
+        @keyframes prizeWon {
+            0%, 100% { transform: scale(1.05); }
+            50% { transform: scale(1.15) rotate(5deg); }
+        }
+
+        .prize-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .prize-icon {
+            font-size: 1.5em;
+        }
+
+        .prize-text .prize-name {
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .prize-text .prize-detail {
+            font-size: 0.75em;
+            opacity: 0.8;
+        }
+
+        .prize-check {
+            font-size: 1.5em;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .prize-item.won .prize-check {
+            opacity: 1;
+        }
+
+        .carton-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .carton-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .carton-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .progress-container {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .carton {
+            border: 6px solid #3d1f0c;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(180deg, #8B4513 0%, #A0522D 50%, #8B4513 100%);
+            background-image: 
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,.15) 2px, rgba(0,0,0,.15) 4px),
+                repeating-linear-gradient(0deg, #8B4513, #8B4513 10px, #A0522D 10px, #A0522D 20px);
+            box-shadow: 
+                inset 0 0 40px rgba(0,0,0,0.4), 
+                0 8px 30px rgba(0,0,0,0.5);
+            padding: 10px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .carton-row {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            border-bottom: 4px solid #5a2d0c;
+        }
+
+        .carton-row:last-child {
+            border-bottom: none;
+        }
+
+        .carton-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            border-right: 4px solid #5a2d0c;
+            background: linear-gradient(145deg, #FFF8DC, #FAEBD7);
+            transition: all 0.3s;
+            cursor: pointer;
+            user-select: none;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.15);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .carton-cell:last-child {
+            border-right: none;
+        }
+
+        .carton-cell.empty {
+            background: linear-gradient(145deg, #6d3813, #8B4513);
+            cursor: default;
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .carton-cell.marked {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            transform: scale(0.92);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .carton-cell.marked::after {
+            content: '✓';
+            position: absolute;
+            font-size: 2.5em;
+            color: rgba(255,255,255,0.4);
+        }
+
+        .carton-cell.highlight {
+            animation: cellHighlight 1s ease;
+        }
+
+        @keyframes cellHighlight {
+            0%, 100% { box-shadow: inset 0 2px 6px rgba(0,0,0,0.15); }
+            50% { 
+                box-shadow: 0 0 35px #ffeb3b;
+                transform: scale(1.15);
+                z-index: 10;
+            }
+        }
+
+        .board-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            margin-top: 20px;
+        }
+
+        .board-title {
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+        }
+
+        .board-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(145deg, #f5f5f5, #e0e0e0);
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #999;
+            border: 2px solid #ddd;
+            transition: all 0.4s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .board-cell.drawn {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+            border-color: #5568d3;
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.6);
+            animation: cellDraw 0.6s ease;
+        }
+
+        @keyframes cellDraw {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            60% { transform: scale(1.25) rotate(15deg); }
+            100% { transform: scale(1.1) rotate(0deg); opacity: 1; }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: modalShow 0.5s ease;
+        }
+
+        @keyframes modalShow {
+            0% { transform: scale(0.5) rotate(-15deg); opacity: 0; }
+            60% { transform: scale(1.1) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .modal-box h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+            color: #4CAF50;
+        }
+
+        .modal-box p {
+            font-size: 1.4em;
+            margin-bottom: 30px;
+            color: #666;
+        }
+
+        .btn-close {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .btn-close:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (max-width: 1024px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .number-display {
+                width: 150px;
+                height: 150px;
+                font-size: 4em;
+            }
+
+            .carton-cell {
+                font-size: 1.3em;
+            }
+
+            .board-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 Tómbola Italiana 🎲</h1>
+
+        <div class="game-layout">
+            <!-- Panel Izquierdo -->
+            <div class="left-panel">
+                <!-- Número Actual -->
+                <div class="number-panel">
+                    <div class="number-display" id="numberDisplay">-</div>
+                </div>
+
+                <!-- Premios -->
+                <div class="prizes-panel">
+                    <div class="prizes-title">🏆 Premios</div>
+                    <div class="prizes-list">
+                        <div class="prize-item" id="prize-ambo">
+                            <div class="prize-content">
+                                <span class="prize-icon">🎯</span>
+                                <div class="prize-text">
+                                    <div class="prize-name">AMBO</div>
+                                    <div class="prize-detail">2 en línea</div>
+                                </div>
+                            </div>
+                            <span class="prize-check">✓</span>
+                        </div>
+                        <div class="prize-item" id="prize-terno">
+                            <div class="prize-content">
+                                <span class="prize-icon">🎪</span>
+                                <div class="prize-text">
+                                    <div class="prize-name">TERNO</div>
+                                    <div class="prize-detail">3 en línea</div>
+                                </div>
+                            </div>
+                            <span class="prize-check">✓</span>
+                        </div>
+                        <div class="prize-item" id="prize-quaterno">
+                            <div class="prize-content">
+                                <span class="prize-icon">🎨</span>
+                                <div class="prize-text">
+                                    <div class="prize-name">QUATERNO</div>
+                                    <div class="prize-detail">4 en línea</div>
+                                </div>
+                            </div>
+                            <span class="prize-check">✓</span>
+                        </div>
+                        <div class="prize-item" id="prize-quinto">
+                            <div class="prize-content">
+                                <span class="prize-icon">⭐</span>
+                                <div class="prize-text">
+                                    <div class="prize-name">QUINTO</div>
+                                    <div class="prize-detail">5 en línea</div>
+                                </div>
+                            </div>
+                            <span class="prize-check">✓</span>
+                        </div>
+                        <div class="prize-item" id="prize-tombola">
+                            <div class="prize-content">
+                                <span class="prize-icon">👑</span>
+                                <div class="prize-text">
+                                    <div class="prize-name">TÓMBOLA</div>
+                                    <div class="prize-detail">Cartón completo</div>
+                                </div>
+                            </div>
+                            <span class="prize-check">✓</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartón -->
+            <div class="carton-section">
+                <div class="carton-header">
+                    <div class="carton-title">🎴 Tu Cartón</div>
+                    <div class="progress-container">
+                        <div class="progress-fill" id="progressFill" style="width: 0%">
+                            <span id="progressText">0 / 15</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="carton" id="carton"></div>
+            </div>
+        </div>
+
+        <!-- Tablero General -->
+        <div class="board-section">
+            <div class="board-title">📊 Tablero General (1-90)</div>
+            <div class="board-grid" id="boardGrid"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Premios -->
+    <div class="modal" id="modal">
+        <div class="modal-box">
+            <h2 id="modalTitle">🎉</h2>
+            <p id="modalText"></p>
+            <button class="btn-close" onclick="closeModal()">¡Continuar!</button>
+        </div>
+    </div>
+
+    <script>
+        // Clase del juego
+        class Tombola {
+            constructor() {
+                this.carton = this.createCarton();
+                this.marked = [];
+                this.drawn = [];
+                this.available = Array.from({length: 90}, (_, i) => i + 1);
+                this.prizes = {
+                    ambo: false,
+                    terno: false,
+                    quaterno: false,
+                    quinto: false,
+                    tombola: false
+                };
+            }
+
+            createCarton() {
+                const carton = [[], [], []];
+                
+                // Generar números por columna
+                for (let col = 0; col < 9; col++) {
+                    const min = col * 10 + 1;
+                    const max = col === 8 ? 90 : (col + 1) * 10;
+                    const nums = [];
+                    
+                    for (let n = min; n <= max; n++) nums.push(n);
+                    this.shuffle(nums);
+                    
+                    const selected = nums.slice(0, 3).sort((a, b) => a - b);
+                    const rows = [0, 1, 2];
+                    this.shuffle(rows);
+                    
+                    for (let i = 0; i < 3; i++) {
+                        carton[rows[i]][col] = i < selected.length ? selected[i] : null;
+                    }
+                }
+
+                // Ajustar a 5 números por fila
+                for (let row = 0; row < 3; row++) {
+                    let count = carton[row].filter(n => n !== null).length;
+                    
+                    while (count > 5) {
+                        const indices = carton[row].map((n, i) => n !== null ? i : -1).filter(i => i >= 0);
+                        carton[row][indices[Math.floor(Math.random() * indices.length)]] = null;
+                        count--;
+                    }
+                    
+                    while (count < 5) {
+                        const empty = carton[row].map((n, i) => n === null ? i : -1).filter(i => i >= 0);
+                        if (empty.length === 0) break;
+                        
+                        const col = empty[Math.floor(Math.random() * empty.length)];
+                        const min = col * 10 + 1;
+                        const max = col === 8 ? 90 : (col + 1) * 10;
+                        const used = [carton[0][col], carton[1][col], carton[2][col]].filter(n => n !== null);
+                        
+                        for (let n = min; n <= max; n++) {
+                            if (!used.includes(n)) {
+                                carton[row][col] = n;
+                                count++;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return carton;
+            }
+
+            shuffle(arr) {
+                for (let i = arr.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                }
+            }
+
+            draw() {
+                if (this.available.length === 0) return null;
+                const idx = Math.floor(Math.random() * this.available.length);
+                const num = this.available.splice(idx, 1)[0];
+                this.drawn.push(num);
+                return num;
+            }
+
+            mark(num) {
+                if (!this.marked.includes(num)) {
+                    this.marked.push(num);
+                }
+            }
+
+            hasNumber(num) {
+                return this.carton.flat().includes(num);
+            }
+
+            checkPrizes() {
+                const newPrizes = [];
+
+                for (let row = 0; row < 3; row++) {
+                    const rowNums = this.carton[row].filter(n => n !== null);
+                    const markedInRow = rowNums.filter(n => this.marked.includes(n)).length;
+
+                    if (markedInRow >= 2 && !this.prizes.ambo) {
+                        this.prizes.ambo = true;
+                        newPrizes.push('ambo');
+                    }
+                    if (markedInRow >= 3 && !this.prizes.terno) {
+                        this.prizes.terno = true;
+                        newPrizes.push('terno');
+                    }
+                    if (markedInRow >= 4 && !this.prizes.quaterno) {
+                        this.prizes.quaterno = true;
+                        newPrizes.push('quaterno');
+                    }
+                    if (markedInRow === 5 && !this.prizes.quinto) {
+                        this.prizes.quinto = true;
+                        newPrizes.push('quinto');
+                    }
+                }
+
+                const total = this.carton.flat().filter(n => n !== null).length;
+                if (this.marked.length === total && !this.prizes.tombola) {
+                    this.prizes.tombola = true;
+                    newPrizes.push('tombola');
+                    stopAutomatic();
+                }
+
+                return newPrizes;
+            }
+        }
+
+        // Variables globales
+        let game = new Tombola();
+        let autoInterval = null;
+
+        // Iniciar sorteo automático
+        function startAutomatic() {
+            setTimeout(() => drawNumber(), 1000);
+            autoInterval = setInterval(() => drawNumber(), 15000);
+        }
+
+        // Detener sorteo automático
+        function stopAutomatic() {
+            if (autoInterval) {
+                clearInterval(autoInterval);
+                autoInterval = null;
+            }
+        }
+
+        // Sortear número
+        function drawNumber() {
+            const num = game.draw();
+            if (num === null) {
+                stopAutomatic();
+                return;
+            }
+
+            // Mostrar número
+            const display = document.getElementById('numberDisplay');
+            display.textContent = num;
+            display.classList.remove('pulse');
+            setTimeout(() => display.classList.add('pulse'), 10);
+
+            // Marcar en tablero
+            const boardCell = document.getElementById(`board-${num}`);
+            if (boardCell) boardCell.classList.add('drawn');
+
+            // Si está en el cartón, marcarlo
+            if (game.hasNumber(num)) {
+                game.mark(num);
+                renderCarton();
+                highlightCell(num);
+                updateProgress();
+                setTimeout(() => verifyPrizes(), 600);
+            }
+        }
+
+        // Renderizar cartón
+        function renderCarton() {
+            const container = document.getElementById('carton');
+            container.innerHTML = '';
+
+            game.carton.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'carton-row';
+
+                row.forEach(cell => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'carton-cell';
+                    
+                    if (cell === null) {
+                        cellDiv.classList.add('empty');
+                    } else {
+                        cellDiv.textContent = cell;
+                        cellDiv.dataset.number = cell;
+                        if (game.marked.includes(cell)) {
+                            cellDiv.classList.add('marked');
+                        }
+                    }
+
+                    rowDiv.appendChild(cellDiv);
+                });
+
+                container.appendChild(rowDiv);
+            });
+        }
+
+        // Renderizar tablero
+        function renderBoard() {
+            const container = document.getElementById('boardGrid');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 90; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'board-cell';
+                cell.textContent = i;
+                cell.id = `board-${i}`;
+                if (game.drawn.includes(i)) {
+                    cell.classList.add('drawn');
+                }
+                container.appendChild(cell);
+            }
+        }
+
+        // Resaltar celda
+        function highlightCell(num) {
+            const cells = document.querySelectorAll('.carton-cell');
+            cells.forEach(cell => {
+                if (cell.dataset.number == num) {
+                    cell.classList.add('highlight');
+                    setTimeout(() => cell.classList.remove('highlight'), 1000);
+                }
+            });
+        }
+
+        // Actualizar progreso
+        function updateProgress() {
+            const total = game.carton.flat().filter(n => n !== null).length;
+            const percent = (game.marked.length / total) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressText').textContent = `${game.marked.length} / ${total}`;
+        }
+
+        // Verificar premios
+        function verifyPrizes() {
+            const newPrizes = game.checkPrizes();
+            
+            newPrizes.forEach((prize, idx) => {
+                setTimeout(() => {
+                    document.getElementById(`prize-${prize}`).classList.add('won');
+                    launchConfetti();
+                    showModal(prize);
+                }, idx * 800);
+            });
+        }
+
+        // Mostrar modal
+        function showModal(prize) {
+            const names = {
+                ambo: 'AMBO',
+                terno: 'TERNO',
+                quaterno: 'QUATERNO',
+                quinto: 'QUINTO',
+                tombola: 'TÓMBOLA'
+            };
+
+            const messages = {
+                ambo: '¡Conseguiste 2 números en línea!',
+                terno: '¡Conseguiste 3 números en línea!',
+                quaterno: '¡Conseguiste 4 números en línea!',
+                quinto: '¡Línea completa con 5 números!',
+                tombola: '¡¡¡CARTÓN COMPLETO!!! ¡GANASTE!'
+            };
+
+            document.getElementById('modalTitle').textContent = `🎉 ${names[prize]} 🎉`;
+            document.getElementById('modalText').textContent = messages[prize];
+            document.getElementById('modal').classList.add('show');
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        // Confetti
+        function launchConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#ffeaa7', '#a29bfe'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const piece = document.createElement('div');
+                    piece.style.position = 'fixed';
+                    piece.style.width = '10px';
+                    piece.style.height = '10px';
+                    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    piece.style.left = Math.random() * 100 + '%';
+                    piece.style.top = '-10px';
+                    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    piece.style.zIndex = '9999';
+                    piece.style.pointerEvents = 'none';
+                    
+                    document.body.appendChild(piece);
+                    
+                    const anim = piece.animate([
+                        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                        { transform: `translateY(${window.innerHeight}px) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                    ], {
+                        duration: 3000 + Math.random() * 2000,
+                        easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                    });
+                    
+                    anim.onfinish = () => piece.remove();
+                }, i * 30);
+            }
+        }
+
+        // Iniciar juego
+        window.onload = () => {
+            renderCarton();
+            renderBoard();
+            updateProgress();
+            startAutomatic();
+        };
+    </script>
+</body>
+</html>
